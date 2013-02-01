@@ -13,6 +13,8 @@
 
 static const char *phelp = "-h";
 static const char *phelpv = "--help";
+static const char *pdump = "-d";
+static const char *pdumpv = "--dump";
 static const char *pout = "-o";
 static const char *ppalt = "-pt";
 static const char *ppaltv = "--palette-text";
@@ -64,7 +66,7 @@ int main(int argc, char *argv[])
     while(*q != '\0')
         *p++ = *q++;
     *p++ = '.'; *p++ = 'b'; *p++ = 'i'; *p++ = 'n'; *p = '\0';
-    int i, pal_type = PAL_DEFAULT, key = -1, show_help = 0, show_ver = 0;
+    int i, pal_type = PAL_DEFAULT, key = -1, show_help = 0, show_ver = 0, dump_img = 0;
     
     /* Parse arguments. */
     for (i=2; i<argc; ++i)
@@ -75,6 +77,10 @@ int main(int argc, char *argv[])
                 out_fn = argv[++i];
             else
                 return error(ERR_ARGS);
+        }
+        else if(!strcmp(argv[i],pdump) || !strcmp(argv[i],pdumpv))
+        {
+            dump_img = 1;
         }
         else if(!strcmp(argv[i],ppalt) || !strcmp(argv[i],ppaltv))
         {
@@ -157,12 +163,20 @@ int main(int argc, char *argv[])
     fwrite(cbuffer,sizeof(uint8_t),(bih->width*bih->height)/2,file);
     fclose(file);
 
-    free(cbuffer);
-    free(buffer);
-
     /* Print useful information for use with the assembler. */
     printf("Command: importbin %s 0 %u spr_%s\n",
             out_fn,(bih->width*bih->height)/2,out_fn);
+
+    /* Dump the image if requested. */
+    if(dump_img)
+    {
+        printf("Dump:\n");
+        dump_image(cbuffer, bih->width, bih->height);    
+    }
+
+    /* Clean up. */
+    free(cbuffer);
+    free(buffer);
       
     return 0;
 }
@@ -218,4 +232,5 @@ int help(void)
 int version(void)
 {
     printf("img16 1.0 - a chip16 image converter\n");
+    return 100;
 }
