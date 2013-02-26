@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     while(*q != '\0')
         *p++ = *q++;
     *p++ = '.'; *p++ = 'b'; *p++ = 'i'; *p++ = 'n'; *p = '\0';
-    int i, pal_type = PAL_DEFAULT, key = -1, dither = 1;
+    int i, pal_type = PAL_DEFAULT, key = -1, dither = 0;
     int show_help = 0, show_ver = 0, show_info = 0, dump_img = 0;
     
     /* Parse arguments. */
