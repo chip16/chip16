@@ -28,11 +28,11 @@ int extract_chip16_buf(uint8_t *bmp, uint8_t *c16, uint32_t width, uint32_t heig
     return 1;
 }*/
 
-int trunc_add(uint8_t x, uint8_t y)
+uint8_t trunc_add(int x, int y)
 {
-    if((int)x + y < 0)
+    if(x + y < 0)
         return 0;
-    else if((int)x + y > 255)
+    else if(x + y > 255)
         return 255;
     else
         return x + y;
@@ -50,43 +50,48 @@ int palettize(uint8_t *pixels, uint8_t *c16, uint32_t width, uint32_t height,
     {
         for(x=0; x<width; ++x)
         {
-            uint32_t rgb = ((pixels[y*rs + x] << 16) | (pixels[y*rs + x+1] << 8) | pixels[y*rs + x+2]);
+            uint32_t rgb = ((pixels[y*rs + x*3] << 16) | 
+                            (pixels[y*rs + (x*3)+1] << 8) |
+                             pixels[y*rs + (x*3)+2]);
             uint8_t i = match_rgb(rgb,pal);
             c16[(height-y-1)*width + x] = i;
+            /* Perform Floyd-Steinberg dithering if requested. */
             if(dither)
             {
-                int eb = pixels[y*rs + x*3] - (pal[i] >> 16) & 0xff;
-                int eg = pixels[y*rs + x*3 + 1] - (pal[i] >> 8) & 0xff;
-                int er = pixels[y*rs + x*3 + 2] - pal[i] & 0xff;
+                rgb_t *rgbu = (rgb_t *)&rgb;
+                rgbu_t *p = (rgbu_t *)&pal[i];
+                int eb = rgbu->b - p->b;
+                int eg = rgbu->g - p->g;
+                int er = rgbu->r - p->r;
                 uint8_t *tb, *tg, *tr;
 
                 tb = &pixels[y*rs + (x+1)*3];
                 tg = &pixels[y*rs + (x+1)*3 + 1];
                 tr = &pixels[y*rs + (x+1)*3 + 2];
-                *tb = trunc_add(*tb,7*eb/16);
-                *tg = trunc_add(*tg,7*eb/16);
-                *tg = trunc_add(*tr,7*eb/16);
+                *tb = trunc_add(*tb,(7*eb)/16);
+                *tg = trunc_add(*tg,(7*eg)/16);
+                *tr = trunc_add(*tr,(7*er)/16);
 
                 tb = &pixels[(y+1)*rs + (x-1)*3];
                 tg = &pixels[(y+1)*rs + (x-1)*3 + 1];
                 tr = &pixels[(y+1)*rs + (x-1)*3 + 2];
-                *tb = trunc_add(*tb,3*eb/16);
-                *tg = trunc_add(*tg,3*eb/16);
-                *tg = trunc_add(*tr,3*eb/16);
+                *tb = trunc_add(*tb,(3*eb)/16);
+                *tg = trunc_add(*tg,(3*eg)/16);
+                *tr = trunc_add(*tr,(3*er)/16);
 
                 tb = &pixels[(y+1)*rs + x*3];
                 tg = &pixels[(y+1)*rs + x*3 + 1];
                 tr = &pixels[(y+1)*rs + x*3 + 2];
-                *tb = trunc_add(*tb,5*eb/16);
-                *tg = trunc_add(*tg,5*eb/16);
-                *tg = trunc_add(*tr,5*eb/16);
+                *tb = trunc_add(*tb,(5*eb)/16);
+                *tg = trunc_add(*tg,(5*eg)/16);
+                *tr = trunc_add(*tr,(5*er)/16);
 
                 tb = &pixels[(y+1)*rs + (x+1)*3];
                 tg = &pixels[(y+1)*rs + (x+1)*3 + 1];
                 tr = &pixels[(y+1)*rs + (x+1)*3 + 2];
-                *tb = trunc_add(*tb,1*eb/16);
-                *tg = trunc_add(*tg,1*eb/16);
-                *tg = trunc_add(*tr,1*eb/16);
+                *tb = trunc_add(*tb,eb/16);
+                *tg = trunc_add(*tg,eg/16);
+                *tr = trunc_add(*tr,er/16);
             }
         }
     }

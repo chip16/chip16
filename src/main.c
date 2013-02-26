@@ -25,6 +25,8 @@ static const char *pkey = "-k";
 static const char *pkeyv = "--key";
 static const char *pinfo = "-i";
 static const char *pinfov = "--info";
+static const char *pdither = "-d";
+static const char *pditherv = "--dither";
 static const char *pver = "-v";
 static const char *pverv = "--version";
 
@@ -109,6 +111,8 @@ int main(int argc, char *argv[])
         }
         else if(!strcmp(argv[i],pinfo) || !strcmp(argv[i],pinfov))
             show_info = 1;
+        else if(!strcmp(argv[i],pdither) || !strcmp(argv[i],pditherv))
+            dither = 1;
         else if(!strcmp(argv[i],phelp) || !strcmp(argv[i],phelpv))
             show_help = 1;
         else if(!strcmp(argv[i],pver) || !strcmp(argv[i],pverv))
@@ -246,12 +250,13 @@ int help(void)
            "\t                              unsigned numbers.\n\n");
     printf("\t-k, --key KEY                 Make the chip16 color KEY transparent\n"
            "\t                              (set to 0)\n\n");
-    printf("\t-i, --info                    Output BMP header information.\n");
+    printf("\t-d, --dither                  Apply dithering (Floyd-Steinberg)\n\n");
+    printf("\t-i, --info                    Output BMP header information.\n\n");
     return 0;
 }
 
 int version(void)
 {
-    printf("img16 1.0 - a chip16 image converter\n");
-    return 100;
+    printf("img16 1.1 - a chip16 image converter\n");
+    return 110;
 }
