@@ -166,7 +166,10 @@ int main(int argc, char *argv[])
     
     /* Allocate space for the (packed) output sprite buffer. */
     uint8_t *ospr_buffer = malloc((bih->width * bih->height)/2);
-    
+   
+    /* Pack the sprite data for output. */
+    sprite_pack(spr_buffer,ospr_buffer,bih->width,bih->height);
+
     /* Extract a chip16 indexed image representation. */
     //if(!extract_chip16_buf(,cbuffer,
     //                       bih->width,bih->height,palette,pal_type,key))
