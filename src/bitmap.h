@@ -52,12 +52,6 @@ typedef enum
 
 int supported_header(bmp_file_hdr *, bmp_info_hdr *);
 
-int extract_chip16_buf(uint8_t *, uint8_t *, uint32_t, uint32_t, uint32_t *, int, int);
-
-int match_rgb(uint32_t, uint32_t *);
-
 void dump_header(bmp_file_hdr *, bmp_info_hdr *);
-
-void dump_image(uint8_t *, uint32_t, uint32_t);
 
 #endif

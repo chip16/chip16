@@ -1,19 +1,20 @@
 CC = gcc
-CFLAGS = 
+CFLAGS = -g 
+SRCDIR = src
 OBJDIR = obj
-OBJS = $(addprefix $(OBJDIR)/, bitmap.o palette.o main.o)
+OBJS = $(addprefix $(OBJDIR)/, bitmap.o palette.o sprite.o main.o)
 
 .PHONY:	all img16
 
 all: img16
 
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS)-c $< -o $@
 
 $(OBJS): $(OBJDIR)
 
 img16: $(OBJS)
-	$(CC) $(CFLAGS)-lm -s $(OBJS) -o img16
+	$(CC) $(CFLAGS)-lm $(OBJS) -o img16
 
 $(OBJDIR):
 	-@mkdir $(OBJDIR)

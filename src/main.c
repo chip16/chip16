@@ -7,6 +7,7 @@
 
 #include "bitmap.h"
 #include "palette.h"
+#include "sprite.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,8 @@ static const char *ppalb = "-pb";
 static const char *ppalbv = "--palette-bin";
 static const char *pkey = "-k";
 static const char *pkeyv = "--key";
+static const char *pinfo = "-i";
+static const char *pinfov = "--info";
 static const char *pver = "-v";
 static const char *pverv = "--version";
 
@@ -66,7 +69,8 @@ int main(int argc, char *argv[])
     while(*q != '\0')
         *p++ = *q++;
     *p++ = '.'; *p++ = 'b'; *p++ = 'i'; *p++ = 'n'; *p = '\0';
-    int i, pal_type = PAL_DEFAULT, key = -1, show_help = 0, show_ver = 0, dump_img = 0;
+    int i, pal_type = PAL_DEFAULT, key = -1, dither = 1;
+    int show_help = 0, show_ver = 0, show_info = 0, dump_img = 0;
     
     /* Parse arguments. */
     for (i=2; i<argc; ++i)
@@ -103,6 +107,8 @@ int main(int argc, char *argv[])
             else
                 return error(ERR_ARGS);
         }
+        else if(!strcmp(argv[i],pinfo) || !strcmp(argv[i],pinfov))
+            show_info = 1;
         else if(!strcmp(argv[i],phelp) || !strcmp(argv[i],phelpv))
             show_help = 1;
         else if(!strcmp(argv[i],pver) || !strcmp(argv[i],pverv))
@@ -133,49 +139,60 @@ int main(int argc, char *argv[])
     /* Map the regions of the bitmap file. */
     bmp_file_hdr *bfh = (bmp_file_hdr *)buffer;
     bmp_info_hdr *bih = (bmp_info_hdr *)(buffer + sizeof(bmp_file_hdr));
-    
+    uint8_t *pixels = (uint8_t *)((uint64_t)bfh + (uint64_t)bfh->offset);
+
     /* Ensure we can handle this BMP type. */
     if(!supported_header(bfh,bih))
     {
         dump_header(bfh, bih);
         return error(ERR_INVALID_BMP);
     }
-    
+    /* Dump the header if requested. */
+    if(show_info)
+        dump_header(bfh, bih);
+
     /* Use the correct palette. */
     if(pal_type != PAL_DEFAULT)
     {
         if(!load_palette(pal_fn,palette,pal_type))
             return error(ERR_FEW_PAL);
     }
+
+    /* Allocate space for the sprite buffer. */
+    uint8_t *spr_buffer = malloc(bih->width * bih->height);
+
+    /* Convert the BGR data to chip16 palletized data. */
+    palettize(pixels,spr_buffer,bih->width,bih->height,palette,pal_type,key,dither);
     
-    /* Allocate space for the chip16 output buffer. */
-    uint8_t *cbuffer = malloc((bih->width * bih->height)/2);
+    /* Allocate space for the (packed) output sprite buffer. */
+    uint8_t *ospr_buffer = malloc((bih->width * bih->height)/2);
     
     /* Extract a chip16 indexed image representation. */
-    if(!extract_chip16_buf((uint8_t *)((uint64_t)bfh + (uint64_t)bfh->offset),cbuffer,
-                           bih->width,bih->height,palette,pal_type,key))
-        return error(-1);
+    //if(!extract_chip16_buf(,cbuffer,
+    //                       bih->width,bih->height,palette,pal_type,key))
+    //    return error(-1);
     
     /* Output the chip16 image to file. */
     file = fopen(out_fn,"wb+");
     if(file == NULL)
         return error(ERR_IO);
-    fwrite(cbuffer,sizeof(uint8_t),(bih->width*bih->height)/2,file);
+    fwrite(ospr_buffer,sizeof(uint8_t),(bih->width*bih->height)/2,file);
     fclose(file);
 
     /* Print useful information for use with the assembler. */
-    printf("Command: importbin %s 0 %u spr_%s\n",
+    printf("importbin %s 0 %u spr_%s\n",
             out_fn,(bih->width*bih->height)/2,out_fn);
 
     /* Dump the image if requested. */
     if(dump_img)
     {
         printf("Dump:\n");
-        dump_image(cbuffer, bih->width, bih->height);    
+        dump_image(ospr_buffer, bih->width, bih->height);    
     }
 
     /* Clean up. */
-    free(cbuffer);
+    free(ospr_buffer);
+    free(spr_buffer);
     free(buffer);
       
     return 0;
@@ -226,6 +243,7 @@ int help(void)
            "\t                              unsigned numbers.\n\n");
     printf("\t-k, --key KEY                 Make the chip16 color KEY transparent\n"
            "\t                              (set to 0)\n\n");
+    printf("\t-i, --info                    Output BMP header information.\n");
     return 0;
 }
 
