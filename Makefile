@@ -13,7 +13,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 $(OBJS): $(OBJDIR)
 
-img16: $(OBJS)
+midi16: $(OBJS)
 	$(CC) $(CFLAGS)-lm $(OBJS) -o midi16
 
 $(OBJDIR):
