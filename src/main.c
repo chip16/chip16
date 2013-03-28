@@ -20,11 +20,14 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "midi.h"
+
 int main(int argc, char **argv)
 {
     FILE *fmid = NULL;
     int size = 0;
     uint8_t *bufmid = NULL;
+    midi_header_t *h = NULL;
 
     if(argc <= 1)
     {
@@ -45,6 +48,14 @@ int main(int argc, char **argv)
     bufmid = malloc(size);
     fread(bufmid,1,size,fmid);
     fclose(fmid);
+
+    h = (midi_header_t*) bufmid;
+    printf("debug: id='%s' size=%d type=%x tracks=%x time_div=%x\n",
+            h->id,
+            h->size[3] | (h->size[2] << 8) | (h->size[1] << 16) | (h->size[0] << 24),
+            h->type[1] | (h->type[0] << 8),
+            h->tracks[1] | (h->tracks[0] << 8),
+            h->time_div[1] | (h->time_div[0] << 8));
 
     return 0;
 }
