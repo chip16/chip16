@@ -7,7 +7,7 @@ IMGFLAGS=--key 0
 
 all: text.c16
 
-text.c16: font.bin
+text.c16: text.s font.bin
 	$(AS) text.s $(ASFLAGS) -o text.c16
 
 font.bin: font.bmp
