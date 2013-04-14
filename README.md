@@ -30,7 +30,7 @@ Others' work (cherry picked):
 
 ROMs:
 * browse the [src](https://github.com/tykel/chip16/tree/master/src) directory for documented examples
-* a showcase of my work, along with a ROM pack, is available [here](http://www.doc.ic.ac.uk/~tk2010/chip16/games)
+* a [showcase of my work](http://www.doc.ic.ac.uk/~tk2010/chip16/games), with a ROM pack
 
 ## What else?
 Other ROMs, emulators, tools and ideas are buried in:
