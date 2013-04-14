@@ -1,17 +1,19 @@
-Chip16 Project
-==============
+Chip16 Project (version 1.2)
+============================
 
-The Chip16 emulation project home.
+The Chip16 emulation project home, with documentation, examples, and help.
 
 ## What is Chip16?
 An emulation project helping programmers write their first emulator, using a well-defined, relatively simple VM specification.
 
 It also doubles as a cool toy platform to write little games and demos for.
 
-## Where to go
-Head over to the [Wiki](https://github.com/tykel/chip16/wiki).
+![Herdle](http://www.doc.ic.ac.uk/~tk2010/chip16/images/herdle.png) - 
+![Mandel](http://i.imgur.com/mLDBryG.png)
 
-You will find exchaustive information about the system, and a full list of opcodes to implement.
+## Where to go - [Wiki](https://github.com/tykel/chip16/wiki)
+
+Head over to the [wiki](https://github.com/tykel/chip16/wiki): you will find exchaustive information about the system, and a full list of opcodes to implement.
 
 You will also find rationale for Chip16's development, as well as guides, soon.
 
@@ -31,7 +33,7 @@ ROMs:
 * a showcase of my work, along with a ROM pack, is available [here](http://www.doc.ic.ac.uk/~tk2010/chip16/games)
 
 ## What else?
-Other ROms, emulators, tools and ideas are buried in:
+Other ROMs, emulators, tools and ideas are buried in:
 
 [Original development thread (NGEmu/Emuforums)](http://forums.ngemu.com/showthread.php?t=145620)
 
