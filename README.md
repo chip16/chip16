@@ -26,7 +26,7 @@ My work, excluding ROMs:
 
 Others' work (cherry picked):
 * [RefChip16](http://code.google.com/p/refchip16) - [Refraction](http://code.google.com/u/refraction) (PCSX2 dev)'s emulator; best choice for Windows
-* [hchip16](http://github.com/vahokif/hchip16) - emulator written in Haskell, for cool people
+* [hchip](http://github.com/vahokif/hchip) - emulator written in Haskell, for cool people
 
 ROMs:
 * browse the [src](https://github.com/tykel/chip16/tree/master/src) directory for documented examples
