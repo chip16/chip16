@@ -37,3 +37,4 @@ Other ROMs, emulators, tools and ideas are buried in:
 
 [Original development thread (NGEmu/Emuforums)](http://forums.ngemu.com/showthread.php?t=145620)
 
+If you have any porgram, or patch to contribute, feel free to post a Pull Request!
