@@ -397,11 +397,12 @@ game_win_pause:
 ; Non-standard: uses 0xFF as string terminator
 text_disp:
 	spr 0x0F05							; chars are 10x15 px
-	ldi r4, 0x00FF
+	;ldi r4, 0x00FF
 text_disp_cont:
 	ldm r3, r0							; read value...
 	andi r3, 0x00FF						; ...but keep only low byte
-	jme r3, r4, text_disp_end			; hit end-of-string, exit
+	jz text_disp_end        			; hit end-of-string, exit
+    subi r3, 0x30
 	muli r3, 75							; convert char offs to byte offs (thx S)
 	addi r3, spr_font					; offset to ascii data
 	drw r1, r2, r3
@@ -422,8 +423,10 @@ pause:
 pause_end:
 	ret
 ;-------------------------------------------------------------------------------
-; String data -- cannot use string literals, since the data is not ASCII!
+; String data -- cannot use string literals (non-standard encoding)
 ascii_press_start:
+    db "Press START"
+    db 0
 	db 0x30		; P
 	db 0x52		; r
 	db 0x45 	; e

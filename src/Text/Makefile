@@ -5,13 +5,13 @@ IMGFLAGS=--key 0
 
 .PHONY: all clean
 
-all: text.c16
+all: Text.c16
 
-text.c16: text.s font.bin
-	$(AS) text.s $(ASFLAGS) -o text.c16
+Text.c16: Text.asm font.bin
+	$(AS) $< $(ASFLAGS) -o $@
 
 font.bin: font.bmp
 	$(IMG) font.bmp $(IMGFLAGS) -o font.bin
 
 clean:
-	rm -rf font.bin text.c16
+	rm -rf font.bin Text.c16

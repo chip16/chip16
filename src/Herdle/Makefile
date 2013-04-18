@@ -7,7 +7,7 @@ IMGFLAGS=
 
 all: Herdle.c16
 
-Herdle.c16: Herdle.s
+Herdle.c16: Herdle.asm
 	$(AS) $< $(ASFLAGS) -o $@
 
 clean:

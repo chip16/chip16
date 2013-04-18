@@ -7,7 +7,7 @@ IMGFLAGS=
 
 all: Bounce.c16
 
-Bounce.c16: Bounce.s
+Bounce.c16: Bounce.asm
 	$(AS) $< $(ASFLAGS) -o $@
 
 clean:

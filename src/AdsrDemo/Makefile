@@ -8,7 +8,7 @@ GFXDIR=gfx
 
 all: AdsrDemo.c16
 
-AdsrDemo.c16: AdsrDemo.s $(GFXDIR)/font.bin $(GFXDIR)/arrow.bin
+AdsrDemo.c16: AdsrDemo.asm $(GFXDIR)/font.bin $(GFXDIR)/arrow.bin
 	$(AS) $< $(ASFLAGS) -o $@
 
 $(GFXDIR)/%.bin: $(GFXDIR)/%.bmp

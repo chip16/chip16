@@ -7,7 +7,7 @@ IMGFLAGS=
 
 all: Music.c16
 
-Music.c16: Music.s
+Music.c16: Music.asm
 	$(AS) $< $(ASFLAGS) -o $@
 
 clean:
