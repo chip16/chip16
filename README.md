@@ -22,7 +22,7 @@ My work, excluding ROMs:
 * [mash16](http://code.google.com/p/mash16) - my own emulator; best choice for Linux 
 * [Js16](http://www.doc.ic.ac.uk/~tk2010/chip16) - my alt. emulator, in-browser
 * [tchip16](http://code.google.com/p/tchip16) - assembler
-* [img16](http://code.google.com/p/img16) - image to sprite converter
+* [img16](http://code.google.com/p/img16) - image to sprite converter (also available in the [src](https://github.com/tykel/chip16/tree/master/src) directory)
 
 Others' work (cherry picked):
 * [RefChip16](http://code.google.com/p/refchip16) - [Refraction](http://code.google.com/u/refraction) (PCSX2 dev)'s emulator; best choice for Windows
