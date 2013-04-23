@@ -72,7 +72,7 @@ title:
 title_loop:
 	ldm r0, 0xFFF0
 	andi r0, 0x20
-	jmz title_loop
+	jz title_loop
 ;-----------
 ; Initialization code
 init:
@@ -82,7 +82,7 @@ init:
 	ldm r5, 0xF300						; reset timer
 	ldi r0, 20							; if 20 or less, game is won!
 	sub r0, r5
-	jmc init_cont
+	jc init_cont
 	jmp game_win
 init_cont:
 	ldi r7, 0							; no boxes initially
@@ -99,7 +99,7 @@ zero_array:
 	ldi r1, 0x258
 zero_array_cont:
 	subi r1, 2
-	jmc place_exit
+	jc place_exit
 	add r0, r1, r2
 	ldi r3, 0x0000
 	stm r3, r2
@@ -114,7 +114,7 @@ place_sheep:
 	ldi r3, 0xF000						; coll. array base address
 place_sheep_loop:
 	subi r0, 1
-	jmc place_dog
+	jc place_dog
 	rnd r1, 15							; random sheep.x
 	addi r1, 2
 	rnd r2, 7							; random sheep.y
@@ -142,18 +142,18 @@ wander_sheep:
 get_input:
 	ldm r0, 0xFFF0						; get P1 ctlr status
 	andi r0, 0x0D
-	jmz move
+	jz move
 	mov rc, r0
 ;-----------
 ; Move player according to direction
 move:
 	subi re, 1
-	jmz move_cont
+	jz move_cont
 	jmp draw							; [modify this to improve speed]
 move_cont:
 	ldm re, 0xF302						; first, reset counter
 	subi r5, 1							; then, decrement the timer
-	jmz game_over						; time's up!
+	jz game_over						; time's up!
 move_update_timer:
 	ldi r1, 100							; update path ctr in memory...
 	div r5, r1, r2						; r2 = X00
@@ -179,7 +179,7 @@ move_cont2:
 	snd1 20								; play a sound
 	ldi r0, spr_dog1					; swap animation frame
 	sub rf, r0, r0
-	jmz move_dog2
+	jz move_dog2
 	ldi rf, spr_dog1
 	jmp move_updatebox
 move_dog2:
@@ -190,9 +190,9 @@ move_updatebox:
 move_test_up:
 	ldi r1, 1
 	and r1, rc
-	jmz move_test_left
+	jz move_test_left
 	subi rb, 1
-	jmz move_test_up_check
+	jz move_test_up_check
 	jmp check_collision
 move_test_up_check:
 	ldm r0, 0xF258
@@ -201,18 +201,18 @@ move_test_up_check:
 move_test_left:
 	ldi r1, 4
 	and r1, rc
-	jmz move_test_right
+	jz move_test_right
 	subi ra, 1
-	jmc game_over
+	jc game_over
 	jmp check_collision
 move_test_right:
 	ldi r1, 8
 	and r1, rc
-	jmz check_collision
+	jz check_collision
 	addi ra, 1
 	mov r0, ra
 	subi r0, 20
-	jmc check_collision
+	jc check_collision
 	jmp game_over
 ;-----------
 ; Check for collision at new position
@@ -226,7 +226,7 @@ check_collision:
 	add r1, r0
 	ldm r2, r1
 	andi r2, 0xFFFF
-	jmz lay_box							; 0: no box nor sheep
+	jz lay_box							; 0: no box nor sheep
 	jmp game_over
 ;-----------
 ; Lay a box/fence at position
@@ -263,7 +263,7 @@ draw:
 	ldi r2, 227
 	call text_disp
 	addi rd, 0							; only draw sheep...
-	jmz draw_finish						; ...if this is the first run
+	jz draw_finish						; ...if this is the first run
 ; draw sheep
 draw_sheep:
 	ldi rd, 0							; the first run is over.
@@ -271,13 +271,13 @@ draw_sheep:
 	ldi r1, 0x258
 draw_sheep_cont:
 	subi r1, 2
-	jmc draw_hud
+	jc draw_hud
 	add r0, r1, r2
 	ldm r3, r2
 	mov r2, r1
 	divi r2, 2
 	andi r3, 0xFF00						; check for sheep
-	jmz draw_sheep_cont
+	jz draw_sheep_cont
 	mov r3, r2
 	divi r3, 20
 	mov r4, r3
@@ -303,7 +303,7 @@ draw_top_fence:
 	ldi r1, 0
 draw_top_fence_loop:
 	subi r0, 16
-	jmc draw_exit
+	jc draw_exit
 	drw r0, r1, spr_box
 	jmp draw_top_fence_loop
 draw_exit:
@@ -347,7 +347,7 @@ game_over:
 	call pause
 game_over_cont:
 	subi r6, 1
-	jmc game_over_def
+	jc game_over_def
 	mov r0, r6
 	addi r0, 0x10
 	ori r0, 0xFF00
@@ -387,7 +387,7 @@ game_win:
 	ldi r1, 10
 game_win_pause:
 	subi r1, 1
-	jmc pre_init
+	jc pre_init
 	ldi r0, 240
 	call pause
 	jmp game_win_pause
@@ -397,12 +397,12 @@ game_win_pause:
 ; Non-standard: uses 0xFF as string terminator
 text_disp:
 	spr 0x0F05							; chars are 10x15 px
-	;ldi r4, 0x00FF
+	ldi r4, 0x00FF
 text_disp_cont:
 	ldm r3, r0							; read value...
 	andi r3, 0x00FF						; ...but keep only low byte
-	jz text_disp_end        			; hit end-of-string, exit
-    subi r3, 0x30
+	cmp r3, r4
+    jz text_disp_end        			; hit end-of-string, exit
 	muli r3, 75							; convert char offs to byte offs (thx S)
 	addi r3, spr_font					; offset to ascii data
 	drw r1, r2, r3
@@ -417,7 +417,7 @@ text_disp_end:
 ; r0: delay in vblnks (16.66ms)
 pause:
 	subi r0, 1
-	jmc pause_end
+	jc pause_end
 	vblnk
 	jmp pause
 pause_end:
@@ -425,8 +425,6 @@ pause_end:
 ;-------------------------------------------------------------------------------
 ; String data -- cannot use string literals (non-standard encoding)
 ascii_press_start:
-    db "Press START"
-    db 0
 	db 0x30		; P
 	db 0x52		; r
 	db 0x45 	; e
