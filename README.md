@@ -1,4 +1,4 @@
-Chip16 Project (version 1.2)
+Chip16 Project (version 1.2 = 1.1)
 ============================
 
 The Chip16 emulation project home, with documentation, examples, and help.
