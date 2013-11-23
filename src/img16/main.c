@@ -57,6 +57,7 @@ typedef enum _err_t
 int error(err_t);
 int help(void);
 int version(void);
+void expand_pixels_to_rgb24(uint8_t*,int);
 
 /* Parses arguments, reads file, performs transformations. */
 int main(int argc, char *argv[])
@@ -144,6 +145,9 @@ int main(int argc, char *argv[])
     bmp_file_hdr *bfh = (bmp_file_hdr *)buffer;
     bmp_info_hdr *bih = (bmp_info_hdr *)(buffer + sizeof(bmp_file_hdr));
     uint8_t *pixels = (uint8_t *)((uint64_t)bfh + (uint64_t)bfh->offset);
+    
+    uint8_t *rgb24_pixels = malloc(bih->width * bih->height);
+    expand_pixels_to_rgb24(pixels,bih->bpp);
 
     /* Ensure we can handle this BMP type. */
     if(!supported_header(bfh,bih))
@@ -203,6 +207,46 @@ int main(int argc, char *argv[])
     free(buffer);
       
     return 0;
+}
+
+void expand_pixels_to_rgb24(uint8_t *src, uint8_t* dst, bmp_info_hdr *bih)
+{
+    int x, y;
+    int pad = (bih->width*3) % 4 == 0 ? 0 : 4 - (bih->width*3)%4;
+    
+    switch(bih->bpp)
+    {
+    case 1:
+    case 4:
+    case 8:
+        break;
+    case 16:
+        /* Convert from RGB565 and swap the bytes. */
+        for(y = 0; y < bih->height; ++y)
+        {
+            for(x = 0; x < bih->width; ++x)
+            {
+                uint8_t b1 = src[(y*(bih->width+pad) + x)*2];
+                uint8_t b2 = src[(y*(bih->width+pad) + x)*2 + 1];
+                dst[(y*width + x)*3] = b2 & 0xf8; 
+                dst[(y*width + x)*3 + 1] = b2 & 0x07 | b1 & 0xe0;
+                dst[(y*width + x)*3 + 2] = b1 & 0x1f;
+            }
+        }
+        break;
+    case 24:
+        /* Simply swap the bytes. */
+        for(y = 0; y < bih->height; ++y)
+        {
+            for(x = 0; x < bih->width; ++x)
+            {
+                dst[(y*width + x)*3] = src[(y*(bih->width+pad) + x)*3 + 2];
+                dst[(y*width + x)*3 + 1] = src[(y*(bih->width+pad) + x)*3 + 1];
+                dst[(y*width + x)*3 + 2] = src[(y*(bih->width+pad) + x)*3];
+            }
+        }
+        break;
+    }
 }
 
 int error(err_t code)
