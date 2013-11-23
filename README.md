@@ -1,4 +1,4 @@
-Chip16 Project (version 1.2)
+Chip16 Project (version 1.3)
 ============================
 
 The Chip16 emulation project home, with documentation, examples, and help.
@@ -37,4 +37,4 @@ Other ROMs, emulators, tools and ideas are buried in:
 
 [Original development thread (NGEmu/Emuforums)](http://forums.ngemu.com/showthread.php?t=145620)
 
-If you have any porgram, or patch to contribute, feel free to post a Pull Request!
+If you have any program, or patch to contribute, feel free to post a Pull Request!
