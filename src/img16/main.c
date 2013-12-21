@@ -1,6 +1,6 @@
 /*
  * img16 -- an image converter targetting the chip16.
- * Copyright (C) tykel, 2012
+ * Copyright (C) tykel, 2012-13
  *
  * Licensed under the GPL, V3.
  */
@@ -57,7 +57,7 @@ typedef enum _err_t
 int error(err_t);
 int help(void);
 int version(void);
-void expand_pixels_to_rgb24(uint8_t*,int);
+void expand_pixels_to_rgb24(uint8_t*,uint8_t*,bmp_info_hdr*);
 
 /* Parses arguments, reads file, performs transformations. */
 int main(int argc, char *argv[])
@@ -129,6 +129,11 @@ int main(int argc, char *argv[])
     /* If version flag was passed, display it and return. */
     if(!strcmp(fn,pver) || !strcmp(fn,pverv) || show_ver)
         return version();
+    
+    /* Dithering with a background color you can't see may look ugly... */
+    if(key >= 0 && dither)
+        fprintf(stderr,"warning: dither may not play nicely with"
+                       "transparent color key\n");
 
     /* Open and read the source file. */
     FILE *file = fopen(fn,"rb");
@@ -146,8 +151,8 @@ int main(int argc, char *argv[])
     bmp_info_hdr *bih = (bmp_info_hdr *)(buffer + sizeof(bmp_file_hdr));
     uint8_t *pixels = (uint8_t *)((uint64_t)bfh + (uint64_t)bfh->offset);
     
-    uint8_t *rgb24_pixels = malloc(bih->width * bih->height);
-    expand_pixels_to_rgb24(pixels,bih->bpp);
+    uint8_t *rgb24_pixels = malloc(bih->width * bih->height * 3);
+    expand_pixels_to_rgb24(pixels,rgb24_pixels,bih);
 
     /* Ensure we can handle this BMP type. */
     if(!supported_header(bfh,bih))
@@ -211,8 +216,10 @@ int main(int argc, char *argv[])
 
 void expand_pixels_to_rgb24(uint8_t *src, uint8_t* dst, bmp_info_hdr *bih)
 {
-    int x, y;
-    int pad = (bih->width*3) % 4 == 0 ? 0 : 4 - (bih->width*3)%4;
+    int x, y, pad, width, height;
+    pad = (bih->width*3) % 4 == 0 ? 0 : 4 - (bih->width*3)%4;
+    width = bih->width;
+    height = bih->height;
     
     switch(bih->bpp)
     {
@@ -222,12 +229,12 @@ void expand_pixels_to_rgb24(uint8_t *src, uint8_t* dst, bmp_info_hdr *bih)
         break;
     case 16:
         /* Convert from RGB565 and swap the bytes. */
-        for(y = 0; y < bih->height; ++y)
+        for(y = 0; y < height; ++y)
         {
-            for(x = 0; x < bih->width; ++x)
+            for(x = 0; x < width; ++x)
             {
-                uint8_t b1 = src[(y*(bih->width+pad) + x)*2];
-                uint8_t b2 = src[(y*(bih->width+pad) + x)*2 + 1];
+                uint8_t b1 = src[(y*(width+pad) + x)*2];
+                uint8_t b2 = src[(y*(width+pad) + x)*2 + 1];
                 dst[(y*width + x)*3] = b2 & 0xf8; 
                 dst[(y*width + x)*3 + 1] = b2 & 0x07 | b1 & 0xe0;
                 dst[(y*width + x)*3 + 2] = b1 & 0x1f;
@@ -236,13 +243,13 @@ void expand_pixels_to_rgb24(uint8_t *src, uint8_t* dst, bmp_info_hdr *bih)
         break;
     case 24:
         /* Simply swap the bytes. */
-        for(y = 0; y < bih->height; ++y)
+        for(y = 0; y < height; ++y)
         {
-            for(x = 0; x < bih->width; ++x)
+            for(x = 0; x < width; ++x)
             {
-                dst[(y*width + x)*3] = src[(y*(bih->width+pad) + x)*3 + 2];
-                dst[(y*width + x)*3 + 1] = src[(y*(bih->width+pad) + x)*3 + 1];
-                dst[(y*width + x)*3 + 2] = src[(y*(bih->width+pad) + x)*3];
+                dst[(y*width + x)*3] = src[(y*(width+pad) + x)*3 + 2];
+                dst[(y*width + x)*3 + 1] = src[(y*(width+pad) + x)*3 + 1];
+                dst[(y*width + x)*3 + 2] = src[(y*(width+pad) + x)*3];
             }
         }
         break;
@@ -301,6 +308,6 @@ int help(void)
 
 int version(void)
 {
-    printf("img16 1.1 - a chip16 image converter\n");
-    return 110;
+    printf("img16 1.2 - a chip16 image converter\n");
+    return 120;
 }

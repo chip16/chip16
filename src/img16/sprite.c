@@ -54,7 +54,7 @@ int palettize(uint8_t *pixels, uint8_t *c16, uint32_t width, uint32_t height,
                             (pixels[y*rs + (x*3)+1] << 8) |
                              pixels[y*rs + (x*3)+2]);
             uint8_t i = match_rgb(rgb,pal);
-            c16[(height-y-1)*width + x] = i;
+            c16[(height-y-1)*width + x] = i == key ? 0 : i;
             /* Perform Floyd-Steinberg dithering if requested. */
             if(dither)
             {
