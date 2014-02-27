@@ -1,0 +1,3 @@
+[submodule "src/midi16"]
+	path = src/midi16
+	url = git@github.com:tykel/midi16
