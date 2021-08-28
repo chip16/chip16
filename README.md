@@ -35,6 +35,6 @@ ROMs:
 ## What else?
 Other ROMs, emulators, tools and ideas are buried in:
 
-[Original development thread (NGEmu/Emuforums)](http://forums.ngemu.com/showthread.php?t=145620)
+[Original development thread (NGEmu/Emuforums)](https://www.ngemu.com/threads/chip16-official-thread-development-suggestions.145620/page-44)
 
 If you have any program, or patch to contribute, feel free to post a Pull Request!
